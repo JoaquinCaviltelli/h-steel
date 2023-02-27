@@ -1,13 +1,9 @@
 import { initializeApp } from "firebase/app";
 import {
-  createUserWithEmailAndPassword,
   getAuth,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
-  updateProfile,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import {Toast} from "../components/Toast"
 
 const firebaseConfig = {
@@ -22,60 +18,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 
 
-//iniciar sesion con email
 
-export const signInWithEmail = (email, password) => {
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      // ...
-      console.log(user);
-      Toast.fire({
-        icon: "success",
-        title: "Ingreso correctamente",
-      });
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode);
-    });
-};
 
-//google
-const provider = new GoogleAuthProvider();
-
-export const signInGoogle = () => {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      // ...
-      console.log(user);
-      Toast.fire({
-        icon: "success",
-        title: "Ingreso correctamente",
-      });
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-      console.log(error);
-    });
-};
 
 //cerrar sesion
 
