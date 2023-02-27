@@ -5,6 +5,7 @@ import Private from "../layout/PrivateLayout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
+import DashboardProyect from "../pages/DasboardProyect";
 
 export const router = createBrowserRouter([
     {
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
                     {
                         index: true,
                         element: <Dashboard />,
+                    },
+                    {
+                        path: "/dashboard/proyect",
+                        element: <DashboardProyect/>,
                     },
                 ],
             },

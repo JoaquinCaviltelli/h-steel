@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../config/firebase";
-import { Toast } from "./Toast";
+import { menssageErrorForm, Toast } from "./Toast";
 
 const RegisterForm = ({ setRegister }) => {
   const [form, setForm] = useState({
@@ -32,6 +32,7 @@ const RegisterForm = ({ setRegister }) => {
         // ..
         console.log(errorCode);
         console.log(email);
+        menssageErrorForm(errorCode)
       });
   };
 

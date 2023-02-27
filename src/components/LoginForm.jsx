@@ -1,7 +1,7 @@
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../config/firebase";
-import { Toast } from "./Toast";
+import { menssageErrorForm, Toast } from "./Toast";
 
 const LoginForm = ({ setRegister }) => {
   const [form, setForm] = useState({
@@ -29,7 +29,9 @@ const LoginForm = ({ setRegister }) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode);
+        menssageErrorForm(errorCode)
       });
+
   };
 
   //google
