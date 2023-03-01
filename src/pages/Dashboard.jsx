@@ -10,13 +10,17 @@ import {
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { user } = useUserContext();
   const [proyects, setProyects] = useState([]);
+  const [currentProyect, setCurrentProyect] = useState(null);
 
-  const navigate = useNavigate()
+  const [dataForm, setDataform] = useState({
+    name: "",
+    type: "",
+    largo:""
+  });
 
   const createNewProyect = async () => {
     const { value: text } = await Swal.fire({
@@ -28,11 +32,9 @@ const Dashboard = () => {
 
     if (text) {
       try {
-        const docRef = await addDoc(collection(db, user.email), {
-          nameProyect: text,
-        });
+        const collectionDb = collection(db, user.email);
+        await setDoc(doc(collectionDb, text), {});
         getProyect();
-        console.log("Document written with ID: ", docRef.id);
       } catch (e) {
         console.error("Error adding document: ", e);
       }
@@ -42,37 +44,101 @@ const Dashboard = () => {
   const getProyect = async () => {
     const querySnapshot = await getDocs(collection(db, user.email));
     setProyects(querySnapshot.docs);
-    console.log(querySnapshot.docs[0].id);
+    console.log(querySnapshot.docs);
+    console.log(querySnapshot.docs[2]);
   };
-
-  
 
   useEffect(() => {
     getProyect();
   }, []);
 
-  return (
-    <>
-      <h1>{user.displayName}</h1>
-      <button
-        onClick={createNewProyect}
-        className="rounded bg-gray-500 px-8 py-2 text-white"
-      >
-        Nuevo Proyecto
-      </button>
+  const handelChange = (e) => {
+    setDataform({
+      ...dataForm,
+      [e.target.name]: e.target.value,
+    });
+    console.log(e.target.value);
+  };
 
-      <ul className="flex flex-col">
-        {proyects.map((proyect) => {
-          return (
-            // <li className="cursor-pointer hover:text-orange-400 p-1 hover:bg-gray-100" onClick={() => viewProyect(proyect.id)} key={proyect.id}>
-            //   {proyect.data().nameProyect}
-            // </li>
-            <Link className="cursor-pointer hover:text-orange-400 p-1 hover:bg-gray-100" key={proyect.id} to="/dashboard/proyect">{proyect.data().nameProyect}</Link>
-          );
-        })}
-      </ul>
-    </>
-  );
+  const handelSubmit = async (e) => {
+    e.preventDefault();
+    const nameProyect = currentProyect.id
+    const documentDb = doc(db, user.email, nameProyect);
+    const newCollection = collection(documentDb, dataForm.type);
+  try {
+    await setDoc(doc(newCollection), {
+      name: dataForm.name,
+      type: dataForm.largo,
+    });
+    console.log("added document")
+  } catch (error) {
+    console.log(error)
+  }
+
+  };
+
+  if (!currentProyect)
+    return (
+      <>
+        <h1>{user.displayName}</h1>
+        <button
+          onClick={createNewProyect}
+          className="rounded bg-gray-500 px-8 py-2 text-white"
+        >
+          Nuevo Proyecto
+        </button>
+
+        <ul className="flex flex-col">
+          {proyects.map((proyect) => {
+            return (
+              <li
+                className="cursor-pointer p-1 hover:bg-gray-100 hover:text-orange-400"
+                onClick={() => setCurrentProyect(proyect)}
+                key={proyect.id}
+              >
+                {proyect.id}
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    );
+  else
+    return (
+      <>
+        <h1 className="text-2xl">PROYECTO: {currentProyect.id}</h1>
+        <button onClick={() => setCurrentProyect(null)}>Salir</button>
+        <h3>Agregar panel</h3>
+        <button className="rounded bg-gray-500 px-8 py-2 text-white hover:bg-gray-700">
+          Panel Ext-Ext
+        </button>
+        <button className="rounded bg-gray-500 px-8 py-2 text-white hover:bg-gray-700">
+          Panel Ext-Int
+        </button>
+        <button className="rounded bg-gray-500 px-8 py-2 text-white hover:bg-gray-700">
+          Panel Int-Int
+        </button>
+        <form onSubmit={handelSubmit}>
+          <select name="type" onChange={handelChange}>
+            <option>Pex</option>
+            <option>Pin</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Nombre"
+            name="name"
+            onChange={handelChange}
+          />
+          <input
+            type="text"
+            placeholder="Tipo"
+            name="largo"
+            onChange={handelChange}
+          />
+          <button type="submit">Guardar</button>
+        </form>
+      </>
+    );
 };
 
 export default Dashboard;
